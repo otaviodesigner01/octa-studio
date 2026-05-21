@@ -46,10 +46,10 @@ nav.scrolled{background:rgba(0,0,0,0.92);border-bottom:1px solid var(--border);b
 .hero-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 2s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-/* HERO HEADLINE — fixed so no clipping */
-.hero-headline{font-size:clamp(44px,6.5vw,86px);font-weight:700;line-height:1.0;letter-spacing:-0.04em;overflow:visible}
-.hero-headline .line{display:block;overflow:hidden;padding-bottom:0.08em}
-.hero-headline .line span{display:block;transform:translateY(110%);animation:lineUp 0.9s cubic-bezier(0.16,1,0.3,1) forwards}
+/* HERO HEADLINE — fixed clipping */
+.hero-headline{font-size:clamp(36px,5vw,72px);font-weight:700;line-height:1.15;letter-spacing:-0.035em;overflow:visible}
+.hero-headline .line{display:block;overflow:hidden;padding-bottom:0.14em;margin-bottom:-0.06em}
+.hero-headline .line span{display:block;transform:translateY(110%);animation:lineUp 0.9s cubic-bezier(0.16,1,0.3,1) forwards;white-space:nowrap}
 .hero-headline .line:nth-child(1) span{animation-delay:0.3s}
 .hero-headline .line:nth-child(2) span{animation-delay:0.48s}
 @keyframes lineUp{to{transform:translateY(0)}}
@@ -117,20 +117,60 @@ section{padding:130px 56px}
 .s-tag{font-size:10px;letter-spacing:0.06em;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border);color:var(--muted);transition:border-color .3s}
 .service-item:hover .s-tag{border-color:rgba(255,255,255,0.15)}
 
-/* CLIENTS — white bg */
-#clients{background:var(--white);padding:100px 56px}
+/* CLIENTS */
+#clients{
+  background:linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 50%, #f5f5f5 100%);
+  padding:100px 56px;
+  position:relative;overflow:hidden;
+}
+#clients::before{
+  content:'';position:absolute;
+  top:-200px;right:-200px;
+  width:500px;height:500px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(229,36,33,0.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+#clients::after{
+  content:'';position:absolute;
+  bottom:-150px;left:-150px;
+  width:400px;height:400px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(229,36,33,0.04) 0%, transparent 70%);
+  pointer-events:none;
+}
 .clients-header{margin-bottom:64px}
 .clients-header .section-tag{color:#aaa}
 .clients-header .section-tag-line{background:#ddd}
 .clients-header .section-title{color:var(--black)}
 .clients-header .section-title em{color:#bbb}
-.clients-marquee-wrap{overflow:hidden;padding:16px 0;position:relative}
-.clients-marquee-wrap::before,.clients-marquee-wrap::after{content:'';position:absolute;top:0;bottom:0;width:160px;z-index:2;pointer-events:none}
-.clients-marquee-wrap::before{left:0;background:linear-gradient(to right,#fff 0%,transparent 100%)}
-.clients-marquee-wrap::after{right:0;background:linear-gradient(to left,#fff 0%,transparent 100%)}
-.clients-marquee-track{display:flex;align-items:center;gap:80px;animation:marquee 36s linear infinite;width:max-content}
-.clients-marquee-logo{height:56px;width:auto;object-fit:contain;filter:grayscale(100%) brightness(0.4);transition:filter .4s;flex-shrink:0;max-width:180px}
-.clients-marquee-logo:hover{filter:grayscale(0%) brightness(1)}
+.clients-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.client-card{
+  background:rgba(255,255,255,0.55);
+  border:1px solid rgba(255,255,255,0.75);
+  border-radius:16px;
+  backdrop-filter:blur(20px) saturate(1.6);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);
+  box-shadow:0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0,0,0,0.04);
+  display:flex;align-items:center;justify-content:center;
+  padding:40px 32px;
+  position:relative;overflow:hidden;
+  opacity:0;transform:translateY(16px);
+  transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1),box-shadow 0.3s;
+}
+.client-card::before{
+  content:'';position:absolute;
+  top:-40%;left:-40%;width:180%;height:180%;
+  background:radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.55) 0%, transparent 60%);
+  pointer-events:none;
+}
+.client-card.visible{opacity:1;transform:translateY(0)}
+.client-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.95)}
+.client-card:nth-child(2){transition-delay:0.07s}.client-card:nth-child(3){transition-delay:0.14s}
+.client-card:nth-child(4){transition-delay:0.1s}.client-card:nth-child(5){transition-delay:0.17s}.client-card:nth-child(6){transition-delay:0.24s}
+.client-card:nth-child(7){transition-delay:0.14s}.client-card:nth-child(8){transition-delay:0.21s}.client-card:nth-child(9){transition-delay:0.28s}
+.client-card img{height:52px;width:auto;object-fit:contain;max-width:160px;position:relative;z-index:1;transition:transform .3s}
+.client-card:hover img{transform:scale(1.06)}
 
 /* PORTFOLIO */
 #portfolio{background:var(--gray2);padding-bottom:80px}
@@ -191,7 +231,7 @@ section{padding:130px 56px}
 }
 .testi-card:hover{transform:translateY(-6px);box-shadow:0 24px 48px rgba(0,0,0,0.4)}
 .testi-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gray2) 0%,var(--gray3) 100%)}
-.testi-quote-icon{position:absolute;top:32px;left:36px;font-size:56px;color:var(--red);opacity:0.25;line-height:1;z-index:0}
+.testi-quote-icon{position:absolute;top:24px;left:28px;font-size:48px;color:var(--red);opacity:0.12;line-height:1;z-index:0;pointer-events:none;user-select:none}
 .testi-stars{display:flex;gap:4px;margin-bottom:16px;position:relative;z-index:1}
 .testi-star{color:var(--red);font-size:16px}
 .testi-text{font-size:15px;font-weight:300;color:rgba(255,255,255,0.75);line-height:1.8;margin-bottom:28px;position:relative;z-index:1;flex:1;display:flex;align-items:center}
@@ -274,6 +314,7 @@ footer{background:var(--white);padding:56px 56px 36px;border-top:1px solid #eee}
   .nav-links{display:none}
   .about-grid,.contact-inner,.footer-top{grid-template-columns:1fr}
   .team-grid,.reels-grid{grid-template-columns:1fr 1fr}
+  .clients-grid{grid-template-columns:repeat(2,1fr)}
   .portfolio-grid{grid-template-columns:1fr 1fr}
   .p1,.p2,.p3,.p4,.p5,.p6,.p7,.p8,.p9,.p10{grid-column:auto;grid-row:auto;height:220px}
   .service-item{grid-template-columns:44px 1fr;gap:16px}
@@ -298,7 +339,6 @@ footer{background:var(--white);padding:56px 56px 36px;border-top:1px solid #eee}
     <li><a href="#about">Sobre</a></li>
     <li><a href="#services">Serviços</a></li>
     <li><a href="#portfolio">Portfólio</a></li>
-    <li><a href="#reels">Vídeos</a></li>
     <li><a href="#team">Equipe</a></li>
     <li><a href="#contact">Contato</a></li>
   </ul>
@@ -315,7 +355,7 @@ footer{background:var(--white);padding:56px 56px 36px;border-top:1px solid #eee}
     <div class="hero-tag"><div class="hero-tag-dot"></div>Estratégia · Design · Resultado</div>
     <h1 class="hero-headline">
       <span class="line"><span>Presença que</span></span>
-      <span class="line"><span>gera <em>resultado</em></span></span>
+      <span class="line"><span>gera <em>resultado<span class="red">.</span></em></span></span>
     </h1>
     <div class="hero-cta-wrap">
       <a href="https://wa.me/5535991409445" target="_blank" class="hero-cta">Falar com a equipe →</a>
@@ -390,30 +430,19 @@ footer{background:var(--white);padding:56px 56px 36px;border-top:1px solid #eee}
 <!-- CLIENTS -->
 <section id="clients">
   <div class="clients-header">
-    <div class="section-tag reveal" style="color:#aaa"><div class="section-tag-line" style="background:#ddd"></div>Clientes</div>
+    <div class="section-tag reveal" style="color:#999"><div class="section-tag-line" style="background:#ccc"></div>Clientes</div>
     <h2 class="section-title reveal" style="color:var(--black)">Empresas que<br><em style="color:#bbb">confiam na Octa.</em></h2>
   </div>
-  <div class="clients-marquee-wrap">
-    <div class="clients-marquee-track">
-      <img class="clients-marquee-logo" src="client-agropeças.png" alt="Agropeças">
-      <img class="clients-marquee-logo" src="client-boutique.png" alt="Boutique Doce Pecado">
-      <img class="clients-marquee-logo" src="client-carlota.png" alt="Carlota Transportes">
-      <img class="clients-marquee-logo" src="client-forcatotal.png" alt="Força Total">
-      <img class="clients-marquee-logo" src="client-hemovet.png" alt="HemoVet">
-      <img class="clients-marquee-logo" src="client-mariaeduarda.png" alt="Maria Eduarda">
-      <img class="clients-marquee-logo" src="client-portaltruck.png" alt="Portal Truck">
-      <img class="clients-marquee-logo" src="client-safra.png" alt="Safra">
-      <img class="clients-marquee-logo" src="client-ws.png" alt="WS Gás e Água">
-      <img class="clients-marquee-logo" src="client-agropeças.png" alt="Agropeças">
-      <img class="clients-marquee-logo" src="client-boutique.png" alt="Boutique Doce Pecado">
-      <img class="clients-marquee-logo" src="client-carlota.png" alt="Carlota Transportes">
-      <img class="clients-marquee-logo" src="client-forcatotal.png" alt="Força Total">
-      <img class="clients-marquee-logo" src="client-hemovet.png" alt="HemoVet">
-      <img class="clients-marquee-logo" src="client-mariaeduarda.png" alt="Maria Eduarda">
-      <img class="clients-marquee-logo" src="client-portaltruck.png" alt="Portal Truck">
-      <img class="clients-marquee-logo" src="client-safra.png" alt="Safra">
-      <img class="clients-marquee-logo" src="client-ws.png" alt="WS Gás e Água">
-    </div>
+  <div class="clients-grid">
+    <div class="client-card"><img src="client-agropeças.jpg" alt="Agropeças"></div>
+    <div class="client-card"><img src="client-carlota.jpg" alt="Carlota Transportes"></div>
+    <div class="client-card"><img src="client-safra.jpg" alt="Safra"></div>
+    <div class="client-card"><img src="client-boutique.jpg" alt="Boutique Doce Pecado"></div>
+    <div class="client-card"><img src="client-forcatotal.jpg" alt="Força Total"></div>
+    <div class="client-card"><img src="client-mariaeduarda.jpg" alt="Maria Eduarda"></div>
+    <div class="client-card"><img src="client-hemovet.jpg" alt="HemoVet"></div>
+    <div class="client-card"><img src="client-portaltruck.jpg" alt="Portal Truck"></div>
+    <div class="client-card"><img src="client-ws.jpg" alt="WS Gás e Água"></div>
   </div>
 </section>
 
@@ -440,85 +469,9 @@ footer{background:var(--white);padding:56px 56px 36px;border-top:1px solid #eee}
   </div>
 </section>
 
-<!-- REELS -->
-<section id="reels">
-  <div class="section-tag reveal"><div class="section-tag-line"></div>Captação &amp; Edição</div>
-  <h2 class="section-title reveal">Vídeos que<br><em>param o scroll.</em></h2>
-  <div class="reels-grid">
-    <div class="reel-item reveal">
-      <div class="reel-placeholder"><div class="reel-play">▶</div><span class="reel-label">Adicionar vídeo</span></div>
-      <div class="reel-overlay"><div class="reel-title">Reel Comercial 01</div></div>
-    </div>
-    <div class="reel-item reveal reveal-delay-1">
-      <div class="reel-placeholder"><div class="reel-play">▶</div><span class="reel-label">Adicionar vídeo</span></div>
-      <div class="reel-overlay"><div class="reel-title">Reel Comercial 02</div></div>
-    </div>
-    <div class="reel-item reveal reveal-delay-2">
-      <div class="reel-placeholder"><div class="reel-play">▶</div><span class="reel-label">Adicionar vídeo</span></div>
-      <div class="reel-overlay"><div class="reel-title">Reel Comercial 03</div></div>
-    </div>
-    <div class="reel-item reveal reveal-delay-3">
-      <div class="reel-placeholder"><div class="reel-play">▶</div><span class="reel-label">Adicionar vídeo</span></div>
-      <div class="reel-overlay"><div class="reel-title">Reel Comercial 04</div></div>
-    </div>
-  </div>
-</section>
+<!-- REELS REMOVED -->
 
-<!-- TESTIMONIALS -->
-<section id="testimonials">
-  <div class="section-tag reveal"><div class="section-tag-line"></div>Depoimentos</div>
-  <h2 class="section-title reveal">O que nossos<br><em>clientes dizem.</em></h2>
-  <div class="testi-track-wrap reveal">
-    <div class="testi-track" id="testiTrack">
-
-      <div class="testi-card">
-        <div class="testi-quote-icon">"</div>
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">"A Octa transformou completamente a imagem da nossa empresa. Depois da nova identidade visual, a percepção dos clientes mudou — passamos a ser vistos como referência no setor."</div>
-        <div class="testi-divider"></div>
-        <div class="testi-author"><div class="testi-avatar">AG</div><div><div class="testi-name">Agropeças</div><div class="testi-role">Setor Agrícola</div></div></div>
-      </div>
-
-      <div class="testi-card">
-        <div class="testi-quote-icon">"</div>
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">"Profissionalismo do início ao fim. Entregaram exatamente o que prometeram, dentro do prazo e com uma qualidade que superou nossas expectativas. Recomendo sem hesitar."</div>
-        <div class="testi-divider"></div>
-        <div class="testi-author"><div class="testi-avatar">SF</div><div><div class="testi-name">Safra Assistência Técnica</div><div class="testi-role">Assistência Técnica</div></div></div>
-      </div>
-
-      <div class="testi-card">
-        <div class="testi-quote-icon">"</div>
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">"Os vídeos que eles produziram para nós geraram um engajamento que nunca tínhamos visto. A criatividade e a estratégia por trás de cada peça fazem toda a diferença."</div>
-        <div class="testi-divider"></div>
-        <div class="testi-author"><div class="testi-avatar">HV</div><div><div class="testi-name">HemoVet</div><div class="testi-role">Saúde Animal</div></div></div>
-      </div>
-
-      <div class="testi-card">
-        <div class="testi-quote-icon">"</div>
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">"Minha marca ganhou outra dimensão. O site, as peças e a identidade toda ficaram acima do que eu imaginava. Hoje meus clientes me reconhecem de longe."</div>
-        <div class="testi-divider"></div>
-        <div class="testi-author"><div class="testi-avatar">ME</div><div><div class="testi-name">Maria Eduarda</div><div class="testi-role">Fisioterapia</div></div></div>
-      </div>
-
-      <div class="testi-card">
-        <div class="testi-quote-icon">"</div>
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">"Time extremamente dedicado e atencioso. Sentiram a identidade da nossa marca como se fosse a deles. O resultado final foi impecável e fez muito sucesso no mercado."</div>
-        <div class="testi-divider"></div>
-        <div class="testi-author"><div class="testi-avatar">PT</div><div><div class="testi-name">Portal Truck</div><div class="testi-role">Proteção Veicular</div></div></div>
-      </div>
-
-    </div>
-    <div class="testi-nav">
-      <button class="testi-btn" id="testiPrev">←</button>
-      <button class="testi-btn" id="testiNext">→</button>
-      <div class="testi-dots" id="testiDots"></div>
-    </div>
-  </div>
-</section>
+<!-- TESTIMONIALS REMOVED -->
 
 <!-- TEAM -->
 <section id="team">
@@ -649,7 +602,7 @@ const particles=Array.from({length:100},()=>new Particle());
 
 /* ---- REVEAL ---- */
 const revObs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0.1});
-document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale,.p-item').forEach(r=>revObs.observe(r));
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale,.p-item,.client-card').forEach(r=>revObs.observe(r));
 
 /* ---- COUNT UP ---- */
 const cntObs=new IntersectionObserver(entries=>entries.forEach(e=>{
