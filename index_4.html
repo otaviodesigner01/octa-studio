@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Octa Studio — Design Estratégico</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--red:#e52421;--black:#000;--white:#fff;--gray:#111;--gray2:#1a1a1a;--gray3:#222;--muted:#888;--border:#2a2a2a}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden;cursor:none}
+a{text-decoration:none;color:inherit}
+
+/* CURSOR */
+.cursor{width:8px;height:8px;background:var(--red);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transition:width .25s,height .25s,background .25s,opacity .25s}
+.cursor-ring{width:36px;height:36px;border:1px solid rgba(229,36,33,0.35);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transition:width .25s,height .25s,border-color .25s}
+.cursor.hover{width:52px;height:52px;background:rgba(229,36,33,0.12)}
+.cursor-ring.hover{width:52px;height:52px;border-color:rgba(229,36,33,0.6)}
+.progress-bar{position:fixed;top:0;left:0;height:2px;background:var(--red);z-index:200;width:0%;transition:width .08s linear}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:28px 56px;display:flex;align-items:center;justify-content:space-between;transition:all 0.5s cubic-bezier(0.16,1,0.3,1)}
+nav.scrolled{background:rgba(0,0,0,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);padding:18px 56px}
+.nav-logo img{height:30px}
+.nav-logo-text{display:none;font-size:20px;font-weight:700;letter-spacing:-0.03em;color:var(--white)}
+.nav-logo-text em{font-style:italic;font-weight:300}
+.nav-logo-text .dot{color:var(--red)}
+.nav-links{display:flex;align-items:center;gap:40px;list-style:none}
+.nav-links a{font-size:12px;font-weight:400;color:rgba(255,255,255,0.5);letter-spacing:0.08em;text-transform:uppercase;transition:color 0.3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--red);transition:width .3s}
+.nav-links a:hover{color:var(--white)}
+.nav-links a:hover::after{width:100%}
+.nav-cta{font-size:12px;font-weight:600;color:var(--white);padding:12px 28px;background:var(--red);border-radius:100px;letter-spacing:0.06em;text-transform:uppercase;transition:all 0.3s;animation:pulse-red 3s ease-in-out infinite}
+.nav-cta:hover{background:#c41e1b;transform:scale(1.04)}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(229,36,33,0)}50%{box-shadow:0 0 0 10px rgba(229,36,33,0.12)}}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 56px 100px;position:relative;overflow:hidden}
+.hero-parallax{position:absolute;inset:-15%;z-index:0;will-change:transform}
+.hero-parallax-img{width:100%;height:100%;background:url('hero-bg.png') center center/cover no-repeat;position:relative}
+.hero-parallax-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,1) 0%,rgba(0,0,0,0.72) 38%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0.1) 100%),linear-gradient(to right,rgba(0,0,0,0.65) 0%,transparent 58%)}
+#particles-canvas{position:absolute;inset:0;z-index:1;pointer-events:none}
+.hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;max-width:700px}
+.hero-tag{display:inline-flex;align-items:center;gap:10px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:40px}
+.hero-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* HERO HEADLINE — fixed clipping */
+.hero-headline{font-size:clamp(40px,5.6vw,76px);font-weight:700;line-height:1.12;letter-spacing:-0.035em;overflow:visible}
+.hero-headline .line{display:block;overflow:hidden;padding-bottom:0.12em;margin-bottom:-0.04em}
+.hero-headline .line span{display:block;transform:translateY(110%);animation:lineUp 0.9s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-headline .line:nth-child(1) span{animation-delay:0.3s}
+.hero-headline .line:nth-child(2) span{animation-delay:0.48s}
+@keyframes lineUp{to{transform:translateY(0)}}
+.hero-headline em{font-style:italic;font-weight:300;color:rgba(255,255,255,0.42)}
+.hero-headline .red{color:var(--red)}
+.hero-cta-wrap{opacity:0;animation:fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.85s forwards;margin-top:52px}
+.hero-cta{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--white);padding:18px 36px;background:var(--red);border-radius:100px;letter-spacing:0.06em;text-transform:uppercase;transition:all 0.3s;animation:pulse-red 3s ease-in-out 1.5s infinite}
+.hero-cta:hover{background:#c41e1b;transform:translateY(-2px);gap:16px}
+.hero-scroll{position:absolute;right:56px;top:50%;transform:translateY(-50%) rotate(90deg);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.25);display:flex;align-items:center;gap:12px;z-index:2;opacity:0;animation:fadeIn 1s ease 1.5s forwards}
+.hero-scroll::before{content:'';display:block;width:40px;height:1px;background:rgba(255,255,255,0.15)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{to{opacity:1}}
+
+/* MARQUEE */
+.marquee-wrap{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0;overflow:hidden;background:var(--gray)}
+.marquee-track{display:flex;animation:marquee 24s linear infinite;width:max-content}
+.marquee-item{display:flex;align-items:center;gap:32px;padding:0 32px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.marquee-dot{width:3px;height:3px;background:var(--red);border-radius:50%}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTION */
+section{padding:130px 56px}
+.section-tag{display:flex;align-items:center;gap:12px;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
+.section-tag-line{width:28px;height:1px;background:var(--border)}
+.section-title{font-size:clamp(36px,4.8vw,64px);font-weight:700;line-height:1.0;letter-spacing:-0.025em}
+.section-title em{font-style:italic;font-weight:300;color:var(--muted)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(48px);transition:opacity 0.9s cubic-bezier(0.16,1,0.3,1),transform 0.9s cubic-bezier(0.16,1,0.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.12s}.reveal-delay-2{transition-delay:0.22s}.reveal-delay-3{transition-delay:0.34s}
+.reveal-left{opacity:0;transform:translateX(-48px);transition:opacity 0.9s cubic-bezier(0.16,1,0.3,1),transform 0.9s cubic-bezier(0.16,1,0.3,1)}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(48px);transition:opacity 0.9s cubic-bezier(0.16,1,0.3,1),transform 0.9s cubic-bezier(0.16,1,0.3,1)}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+.reveal-scale{opacity:0;transform:scale(0.94);transition:opacity 0.8s cubic-bezier(0.16,1,0.3,1),transform 0.8s cubic-bezier(0.16,1,0.3,1)}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+
+/* ABOUT */
+#about{background:var(--gray)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start;margin-top:72px}
+.about-text p{font-size:17px;font-weight:300;color:rgba(255,255,255,0.55);line-height:1.95;margin-bottom:28px}
+.about-text p strong{color:var(--white);font-weight:500}
+.about-quote{border-left:2px solid var(--red);padding-left:28px;font-size:19px;font-weight:300;color:var(--white);line-height:1.75;margin-top:48px;font-style:italic}
+.about-right{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border)}
+.stat-box{background:var(--gray2);padding:44px 36px;position:relative;overflow:hidden;transition:background .3s}
+.stat-box:hover{background:var(--gray3)}
+.stat-box::before{content:'';position:absolute;top:0;left:0;width:2px;height:0;background:var(--red);transition:height .5s cubic-bezier(0.16,1,0.3,1)}
+.stat-box:hover::before,.stat-box.counted::before{height:100%}
+.stat-num{font-size:58px;font-weight:700;line-height:1;color:var(--white);letter-spacing:-0.03em}
+.stat-num .accent{color:var(--red)}
+.stat-label{font-size:13px;font-weight:300;color:var(--muted);margin-top:10px;line-height:1.5;max-width:220px}
+
+/* SERVICES */
+#services{background:var(--black)}
+.services-grid{border-top:1px solid var(--border);margin-top:64px}
+.service-item{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:48px;padding:36px 0;border-bottom:1px solid var(--border);position:relative;overflow:hidden;cursor:default}
+.service-item::before{content:'';position:absolute;inset:0;background:var(--gray);transform:translateX(-100%);transition:transform 0.45s cubic-bezier(0.16,1,0.3,1)}
+.service-item:hover::before{transform:translateX(0)}
+.service-item:hover .s-num{color:var(--red)}
+.service-item:hover .s-name{color:var(--white)}
+.s-num{font-size:11px;color:var(--border);letter-spacing:0.1em;position:relative;z-index:1;transition:color .3s;font-weight:400}
+.s-name{font-size:clamp(20px,2.5vw,32px);font-weight:500;color:rgba(255,255,255,0.5);letter-spacing:-0.015em;position:relative;z-index:1;transition:color .3s}
+.s-tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;position:relative;z-index:1}
+.s-tag{font-size:10px;letter-spacing:0.06em;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border);color:var(--muted);transition:border-color .3s}
+.service-item:hover .s-tag{border-color:rgba(255,255,255,0.15)}
+
+/* CLIENTS — white bg */
+#clients{background:var(--white);padding:100px 56px}
+.clients-header{margin-bottom:64px}
+.clients-header .section-tag{color:#aaa}
+.clients-header .section-tag-line{background:#ddd}
+.clients-header .section-title{color:var(--black)}
+.clients-header .section-title em{color:#bbb}
+.clients-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ebebeb;border:1px solid #ebebeb}
+.client-card{background:var(--white);display:flex;align-items:center;justify-content:center;padding:44px 36px;opacity:0;transform:translateY(16px);transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1)}
+.client-card.visible{opacity:1;transform:translateY(0)}
+.client-card:nth-child(2){transition-delay:0.07s}.client-card:nth-child(3){transition-delay:0.14s}
+.client-card:nth-child(4){transition-delay:0.1s}.client-card:nth-child(5){transition-delay:0.17s}.client-card:nth-child(6){transition-delay:0.24s}
+.client-card:nth-child(7){transition-delay:0.14s}.client-card:nth-child(8){transition-delay:0.21s}.client-card:nth-child(9){transition-delay:0.28s}
+.client-card img{height:52px;width:auto;object-fit:contain;filter:grayscale(100%) brightness(0.35);max-width:160px;transition:filter .4s}
+.client-card:hover img{filter:grayscale(0%) brightness(1)}
+
+/* PORTFOLIO */
+#portfolio{background:var(--gray2);padding-bottom:80px}
+.port-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:56px;flex-wrap:wrap;gap:16px}
+.port-link{font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .3s}
+.port-link:hover{color:var(--white)}
+.portfolio-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
+.p-item{position:relative;overflow:hidden;background:var(--gray3);opacity:0;transform:translateY(32px) scale(0.98);transition:opacity 0.7s cubic-bezier(0.16,1,0.3,1),transform 0.7s cubic-bezier(0.16,1,0.3,1)}
+.p-item.visible{opacity:1;transform:translateY(0) scale(1)}
+.p-item:nth-child(2){transition-delay:0.08s}.p-item:nth-child(3){transition-delay:0.14s}
+.p-item:nth-child(4){transition-delay:0.06s}.p-item:nth-child(5){transition-delay:0.12s}.p-item:nth-child(6){transition-delay:0.18s}
+.p-item:nth-child(7){transition-delay:0.1s}.p-item:nth-child(8){transition-delay:0.16s}
+.p-item:nth-child(9){transition-delay:0.05s}.p-item:nth-child(10){transition-delay:0.13s}
+.p-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.7s cubic-bezier(0.16,1,0.3,1),filter .5s}
+.p-item:hover img{transform:scale(1.07);filter:brightness(0.75)}
+.p-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,transparent 55%);opacity:0;transition:opacity .4s;display:flex;flex-direction:column;justify-content:flex-end;padding:24px}
+.p-item:hover .p-overlay{opacity:1}
+.p-title{font-size:16px;font-weight:600;color:var(--white);transform:translateY(10px);transition:transform .35s cubic-bezier(0.16,1,0.3,1)}
+.p-cat{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);margin-top:4px;transform:translateY(10px);transition:transform .35s .05s cubic-bezier(0.16,1,0.3,1)}
+.p-item:hover .p-title,.p-item:hover .p-cat{transform:translateY(0)}
+.p-bar{position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--red);transition:width .45s cubic-bezier(0.16,1,0.3,1)}
+.p-item:hover .p-bar{width:100%}
+.p1{grid-column:1/8;grid-row:1;height:360px}.p2{grid-column:8/13;grid-row:1;height:360px}
+.p3{grid-column:1/5;grid-row:2;height:290px}.p4{grid-column:5/9;grid-row:2;height:290px}.p5{grid-column:9/13;grid-row:2;height:290px}
+.p6{grid-column:1/6;grid-row:3;height:310px}.p7{grid-column:6/9;grid-row:3;height:310px}.p8{grid-column:9/13;grid-row:3;height:310px}
+.p9{grid-column:1/7;grid-row:4;height:290px}.p10{grid-column:7/13;grid-row:4;height:290px}
+
+/* REELS */
+#reels{background:var(--black);padding:130px 56px}
+.reels-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:64px}
+.reel-item{aspect-ratio:9/16;background:var(--gray2);border-radius:8px;overflow:hidden;position:relative;cursor:pointer;transition:transform .4s cubic-bezier(0.16,1,0.3,1)}
+.reel-item:hover{transform:scale(1.03)}
+.reel-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:linear-gradient(135deg,var(--gray2) 0%,var(--gray3) 100%)}
+.reel-play{width:56px;height:56px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .3s,box-shadow .3s}
+.reel-item:hover .reel-play{transform:scale(1.15);box-shadow:0 0 32px rgba(229,36,33,0.5)}
+.reel-label{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.reel-overlay{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .3s;display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+.reel-item:hover .reel-overlay{background:rgba(0,0,0,0.3)}
+.reel-title{font-size:14px;font-weight:600;color:var(--white);opacity:0;transform:translateY(8px);transition:all .35s}
+.reel-item:hover .reel-title{opacity:1;transform:translateY(0)}
+
+/* TESTIMONIALS — slider */
+#testimonials{background:var(--gray);padding:130px 56px;overflow:hidden}
+.testi-track-wrap{margin-top:64px;position:relative}
+.testi-track{display:flex;gap:16px;transition:transform 0.5s cubic-bezier(0.16,1,0.3,1);will-change:transform}
+.testi-card{
+  flex-shrink:0;
+  width:calc((100vw - 112px - 32px) / 3);
+  aspect-ratio:1080/1350;
+  background:var(--gray2);
+  border-radius:12px;
+  border:1px solid var(--border);
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+  padding:36px;
+  position:relative;overflow:hidden;
+  transition:transform .4s cubic-bezier(0.16,1,0.3,1),box-shadow .4s;
+}
+.testi-card:hover{transform:translateY(-6px);box-shadow:0 24px 48px rgba(0,0,0,0.4)}
+.testi-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gray2) 0%,var(--gray3) 100%)}
+.testi-quote-icon{position:absolute;top:24px;left:28px;font-size:48px;color:var(--red);opacity:0.12;line-height:1;z-index:0;pointer-events:none;user-select:none}
+.testi-stars{display:flex;gap:4px;margin-bottom:16px;position:relative;z-index:1}
+.testi-star{color:var(--red);font-size:16px}
+.testi-text{font-size:15px;font-weight:300;color:rgba(255,255,255,0.75);line-height:1.8;margin-bottom:28px;position:relative;z-index:1;flex:1;display:flex;align-items:center}
+.testi-divider{width:32px;height:1px;background:var(--border);margin-bottom:20px;position:relative;z-index:1}
+.testi-author{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.testi-avatar{width:44px;height:44px;border-radius:50%;background:var(--gray3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:var(--muted);flex-shrink:0}
+.testi-name{font-size:15px;font-weight:600;color:var(--white)}
+.testi-role{font-size:11px;color:var(--muted);letter-spacing:0.04em}
+.testi-nav{display:flex;align-items:center;gap:12px;margin-top:40px}
+.testi-btn{width:48px;height:48px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--white);font-size:18px;cursor:none;transition:all .3s;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.testi-btn:hover{background:var(--red);border-color:var(--red)}
+.testi-dots{display:flex;gap:8px;margin-left:8px}
+.testi-dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s;cursor:pointer}
+.testi-dot.active{background:var(--red);width:20px;border-radius:3px}
+
+/* TEAM */
+#team{background:var(--black)}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:72px}
+.team-card{background:var(--gray);overflow:hidden;position:relative;transition:background .3s}
+.team-card:hover{background:var(--gray2)}
+.team-photo-wrap{overflow:hidden}
+.team-photo{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top center;display:block;filter:grayscale(20%);transition:filter .5s,transform .6s cubic-bezier(0.16,1,0.3,1)}
+.team-card:hover .team-photo{filter:grayscale(0%);transform:scale(1.04)}
+.team-info{padding:32px}
+.team-rule{width:24px;height:2px;background:var(--red);margin-bottom:16px}
+.team-name{font-size:20px;font-weight:600;margin-bottom:4px}
+.team-role{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--red);margin-bottom:14px;line-height:1.5}
+.team-bio{font-size:13px;font-weight:300;color:var(--muted);line-height:1.8}
+
+/* CONTACT */
+#contact{background:var(--white);padding:130px 56px}
+.contact-inner{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
+.c-tag{display:flex;align-items:center;gap:12px;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#bbb;margin-bottom:20px}
+.c-tag-line{width:28px;height:1px;background:#e5e5e5}
+.contact-title{font-size:clamp(36px,4.8vw,60px);font-weight:700;line-height:1.0;letter-spacing:-0.025em;color:var(--black)}
+.contact-title em{font-style:italic;font-weight:300;color:#bbb}
+.contact-title .dot{color:var(--red)}
+.contact-sub{font-size:16px;font-weight:300;color:#666;line-height:1.9;margin-top:28px;max-width:400px}
+.contact-sub strong{color:var(--black);font-weight:500}
+.glass-cards{display:flex;flex-direction:column;gap:12px;margin-top:44px}
+.glass-card{display:flex;align-items:center;gap:18px;padding:22px 26px;border-radius:20px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.85);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);box-shadow:0 4px 32px rgba(0,0,0,0.07),inset 0 1px 0 rgba(255,255,255,0.95);position:relative;overflow:hidden;transition:all .3s;text-decoration:none}
+.glass-card::before{content:'';position:absolute;top:-60%;left:-60%;width:200%;height:200%;background:radial-gradient(ellipse at 35% 35%,rgba(255,255,255,0.5) 0%,transparent 55%);pointer-events:none}
+.glass-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.95)}
+.glass-icon{width:48px;height:48px;border-radius:14px;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 12px rgba(229,36,33,0.35)}
+.glass-label{font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#aaa;margin-bottom:3px}
+.glass-value{font-size:15px;font-weight:600;color:var(--black)}
+.contact-form{display:flex;flex-direction:column}
+.form-group{border-bottom:1px solid #ebebeb;position:relative}
+.form-group:first-child{border-top:1px solid #ebebeb}
+.form-group label{display:block;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#bbb;padding:18px 0 4px;transition:color .3s}
+.form-group:focus-within label{color:var(--red)}
+.form-group input,.form-group textarea{width:100%;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:300;color:var(--black);padding:0 0 18px}
+.form-group input::placeholder,.form-group textarea::placeholder{color:#ddd}
+.form-group textarea{height:80px;resize:none}
+.form-line{position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--red);transition:width .4s cubic-bezier(0.16,1,0.3,1)}
+.form-group:focus-within .form-line{width:100%}
+.submit-btn{margin-top:32px;display:inline-flex;align-items:center;gap:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--white);background:var(--black);padding:18px 36px;border-radius:100px;border:none;cursor:none;transition:all .3s;align-self:flex-start;animation:pulse-dark 3s ease-in-out infinite}
+.submit-btn:hover{background:var(--red);gap:18px;transform:translateY(-1px)}
+@keyframes pulse-dark{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 8px rgba(0,0,0,0.07)}}
+
+/* FOOTER */
+footer{background:var(--white);padding:56px 56px 36px;border-top:1px solid #eee}
+.footer-top{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand img{height:24px;margin-bottom:16px;filter:invert(1)}
+.footer-brand-text{display:none;font-size:18px;font-weight:700;letter-spacing:-0.03em;color:var(--black)}
+.footer-desc{font-size:13px;font-weight:300;color:#aaa;line-height:1.9;max-width:280px;margin-top:16px}
+.footer-col-title{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#bbb;margin-bottom:20px}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:12px}
+.footer-links a{font-size:14px;font-weight:300;color:#999;transition:color .3s}
+.footer-links a:hover{color:var(--black)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #eee;padding-top:28px}
+.footer-copy{font-size:12px;color:#ccc}
+.footer-red{color:var(--red);font-weight:600}
+
+@media(max-width:960px){
+  nav,nav.scrolled{padding:18px 24px}
+  #hero,section,#clients,#reels,#testimonials,#contact,footer{padding-left:24px;padding-right:24px}
+  .hero-headline{font-size:40px}
+  .hero-scroll{display:none}
+  .nav-links{display:none}
+  .about-grid,.contact-inner,.footer-top{grid-template-columns:1fr}
+  .team-grid,.reels-grid{grid-template-columns:1fr 1fr}
+  .clients-grid{grid-template-columns:repeat(2,1fr)}
+  .portfolio-grid{grid-template-columns:1fr 1fr}
+  .p1,.p2,.p3,.p4,.p5,.p6,.p7,.p8,.p9,.p10{grid-column:auto;grid-row:auto;height:220px}
+  .service-item{grid-template-columns:44px 1fr;gap:16px}
+  .s-tags{display:none}
+  .testi-card{width:calc(100vw - 48px - 16px)}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo">
+    <img src="logo-white.png" alt="Octa Studio" onerror="this.style.display='none';document.querySelector('.nav-logo-text').style.display='block'">
+    <span class="nav-logo-text">octa<em>studio</em><span class="dot">.</span></span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">Sobre</a></li>
+    <li><a href="#services">Serviços</a></li>
+    <li><a href="#portfolio">Portfólio</a></li>
+    <li><a href="#reels">Vídeos</a></li>
+    <li><a href="#team">Equipe</a></li>
+    <li><a href="#contact">Contato</a></li>
+  </ul>
+  <a href="https://wa.me/5535991409445" target="_blank" class="nav-cta">Falar conosco</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-parallax" id="heroParallax">
+    <div class="hero-parallax-img"></div>
+  </div>
+  <canvas id="particles-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-tag"><div class="hero-tag-dot"></div>Estratégia · Design · Resultado</div>
+    <h1 class="hero-headline">
+      <span class="line"><span>Presença que</span></span>
+      <span class="line"><span>gera <em>resultado</em><span class="red">.</span></span></span>
+    </h1>
+    <div class="hero-cta-wrap">
+      <a href="https://wa.me/5535991409445" target="_blank" class="hero-cta">Falar com a equipe →</a>
+    </div>
+  </div>
+  <div class="hero-scroll">scroll</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">Branding<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Edição de Vídeo<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Design Gráfico<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Gestão de Redes<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Criação de Sites<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Tráfego Pago<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Identidade Visual<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Estratégia Digital<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Lançamentos<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Branding<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Edição de Vídeo<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Design Gráfico<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Gestão de Redes<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Criação de Sites<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Tráfego Pago<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Identidade Visual<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Estratégia Digital<div class="marquee-dot"></div></div>
+    <div class="marquee-item">Lançamentos<div class="marquee-dot"></div></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-tag reveal"><div class="section-tag-line"></div>Sobre nós</div>
+  <div class="about-grid">
+    <div class="about-text">
+      <h2 class="section-title reveal">A marca certa<br><em>abre as portas certas.</em></h2>
+      <p class="reveal reveal-delay-1">Negócios que investem em comunicação visual estratégica crescem mais rápido, cobram mais caro e atraem melhores clientes. <strong>Não é opinião — é o que os dados mostram.</strong></p>
+      <p class="reveal reveal-delay-2">A Octa Studio reúne design, vídeo, tráfego pago e estratégia digital em um único time. Trabalhamos com negócios que levam a própria marca a sério — e querem que o mercado também leve.</p>
+      <p class="reveal reveal-delay-3">Mais de <strong>165 projetos entregues em todo o Brasil</strong>. Cada um pensado para gerar retorno real: mais visibilidade, mais autoridade, mais faturamento.</p>
+      <div class="about-quote reveal reveal-delay-3">"Uma marca bem construída é o ativo de marketing mais valioso que um negócio pode ter."</div>
+    </div>
+    <div class="about-right reveal-right">
+      <div class="stat-box">
+        <div class="stat-num"><span class="count-num" data-target="165">0</span><span class="accent">+</span></div>
+        <div class="stat-label">Projetos entregues em todo o Brasil</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num"><span class="count-num" data-target="100">0</span><span class="accent">%</span></div>
+        <div class="stat-label">Dedicação total em cada projeto entregue</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-tag reveal"><div class="section-tag-line"></div>Nossos serviços</div>
+  <h2 class="section-title reveal">Tudo que sua<br><em>marca precisa.</em></h2>
+  <div class="services-grid">
+    <div class="service-item reveal"><span class="s-num">01</span><span class="s-name">Criação de Marcas</span><div class="s-tags"><span class="s-tag">Identidade Visual</span><span class="s-tag">Branding</span></div></div>
+    <div class="service-item reveal reveal-delay-1"><span class="s-num">02</span><span class="s-name">Design Gráfico &amp; Lançamentos</span><div class="s-tags"><span class="s-tag">Peças Digitais</span><span class="s-tag">Impressos</span><span class="s-tag">Lançamento</span></div></div>
+    <div class="service-item reveal reveal-delay-2"><span class="s-num">03</span><span class="s-name">Edição de Vídeo</span><div class="s-tags"><span class="s-tag">Comercial</span><span class="s-tag">Institucional</span></div></div>
+    <div class="service-item reveal"><span class="s-num">04</span><span class="s-name">Captação de Vídeo</span><div class="s-tags"><span class="s-tag">Mobile</span><span class="s-tag">Estabelecimentos Locais</span></div></div>
+    <div class="service-item reveal reveal-delay-1"><span class="s-num">05</span><span class="s-name">Criação de Sites</span><div class="s-tags"><span class="s-tag">Landing Page</span><span class="s-tag">Institucional</span></div></div>
+    <div class="service-item reveal reveal-delay-2"><span class="s-num">06</span><span class="s-name">Tráfego Pago</span><div class="s-tags"><span class="s-tag">Meta Ads</span><span class="s-tag">Google Ads</span></div></div>
+    <div class="service-item reveal"><span class="s-num">07</span><span class="s-name">Estratégia Digital</span><div class="s-tags"><span class="s-tag">Campanhas</span><span class="s-tag">Conteúdos de Alta Conversão</span></div></div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section id="clients">
+  <div class="clients-header">
+    <div class="section-tag reveal" style="color:#aaa"><div class="section-tag-line" style="background:#ddd"></div>Clientes</div>
+    <h2 class="section-title reveal" style="color:var(--black)">Empresas que<br><em style="color:#bbb">confiam na Octa.</em></h2>
+  </div>
+  <div class="clients-grid">
+    <div class="client-card"><img src="client-agropeças.png" alt="Agropeças"></div>
+    <div class="client-card"><img src="client-boutique.png" alt="Boutique Doce Pecado"></div>
+    <div class="client-card"><img src="client-carlota.png" alt="Carlota Transportes"></div>
+    <div class="client-card"><img src="client-forcatotal.png" alt="Força Total"></div>
+    <div class="client-card"><img src="client-hemovet.png" alt="HemoVet"></div>
+    <div class="client-card"><img src="client-mariaeduarda.png" alt="Maria Eduarda"></div>
+    <div class="client-card"><img src="client-portaltruck.png" alt="Portal Truck"></div>
+    <div class="client-card"><img src="client-safra.png" alt="Safra"></div>
+    <div class="client-card"><img src="client-ws.png" alt="WS Gás e Água"></div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="port-header reveal">
+    <div>
+      <div class="section-tag"><div class="section-tag-line"></div>Portfólio</div>
+      <h2 class="section-title">Resultados que<br><em>falam por si.</em></h2>
+    </div>
+    <a href="#contact" class="port-link">Quero um projeto assim →</a>
+  </div>
+  <div class="portfolio-grid">
+    <div class="p-item p1"><img src="p1.jpeg" alt="Stratus Internet"><div class="p-overlay"><div class="p-title">Stratus Internet</div><div class="p-cat">Mídia Exterior</div></div><div class="p-bar"></div></div>
+    <div class="p-item p2"><img src="p2.png" alt="Safra"><div class="p-overlay"><div class="p-title">Safra Assistência Técnica</div><div class="p-cat">Branding · Frota</div></div><div class="p-bar"></div></div>
+    <div class="p-item p3"><img src="p3.png" alt="Boutique Doce Pecado"><div class="p-overlay"><div class="p-title">Boutique Doce Pecado</div><div class="p-cat">Branding</div></div><div class="p-bar"></div></div>
+    <div class="p-item p4"><img src="p4.png" alt="Stratus Flyer"><div class="p-overlay"><div class="p-title">Stratus Internet</div><div class="p-cat">Design · Flyer</div></div><div class="p-bar"></div></div>
+    <div class="p-item p5"><img src="p5.png" alt="PlacLux"><div class="p-overlay"><div class="p-title">PlacLux</div><div class="p-cat">Mídia · Frota</div></div><div class="p-bar"></div></div>
+    <div class="p-item p6"><img src="p6.png" alt="Brasil Roque"><div class="p-overlay"><div class="p-title">Brasil Roque</div><div class="p-cat">Branding · Frota</div></div><div class="p-bar"></div></div>
+    <div class="p-item p7"><img src="p7.png" alt="Owner's Club"><div class="p-overlay"><div class="p-title">Owner's Club</div><div class="p-cat">Branding</div></div><div class="p-bar"></div></div>
+    <div class="p-item p8"><img src="p8.png" alt="Academia Cetocarnívora"><div class="p-overlay"><div class="p-title">Academia Cetocarnívora</div><div class="p-cat">Site</div></div><div class="p-bar"></div></div>
+    <div class="p-item p9"><img src="p9.png" alt="HemoVet"><div class="p-overlay"><div class="p-title">HemoVet</div><div class="p-cat">Branding</div></div><div class="p-bar"></div></div>
+    <div class="p-item p10"><img src="p10.png" alt="Agropeças"><div class="p-overlay"><div class="p-title">Agropeças</div><div class="p-cat">Branding</div></div><div class="p-bar"></div></div>
+  </div>
+</section>
+
+<!-- REELS -->
+<section id="reels">
+  <div class="section-tag reveal"><div class="section-tag-line"></div>Captação &amp; Edição</div>
+  <h2 class="section-title reveal">Vídeos que<br><em>param o scroll.</em></h2>
+  <div class="reels-grid">
+    <div class="reel-item reveal">
+      <div class="reel-placeholder"><div class="reel-play">▶</div><span class="reel-label">Adicionar vídeo</span></div>
+      <div class="reel-overlay"><div class="reel-title">Reel Comercial 01</div></div>
+    </div>
+    <div class="reel-item reveal reveal-delay-1">
+      <div class="reel-placeholder"><div class="reel-play">▶</div><span class="reel-label">Adicionar vídeo</span></div>
+      <div class="reel-overlay"><div class="reel-title">Reel Comercial 02</div></div>
+    </div>
+    <div class="reel-item reveal reveal-delay-2">
+      <div class="reel-placeholder"><div class="reel-play">▶</div><span class="reel-label">Adicionar vídeo</span></div>
+      <div class="reel-overlay"><div class="reel-title">Reel Comercial 03</div></div>
+    </div>
+    <div class="reel-item reveal reveal-delay-3">
+      <div class="reel-placeholder"><div class="reel-play">▶</div><span class="reel-label">Adicionar vídeo</span></div>
+      <div class="reel-overlay"><div class="reel-title">Reel Comercial 04</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-tag reveal"><div class="section-tag-line"></div>Depoimentos</div>
+  <h2 class="section-title reveal">O que nossos<br><em>clientes dizem.</em></h2>
+  <div class="testi-track-wrap reveal">
+    <div class="testi-track" id="testiTrack">
+
+      <div class="testi-card">
+        <div class="testi-quote-icon">"</div>
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"A Octa transformou completamente a imagem da nossa empresa. Depois da nova identidade visual, a percepção dos clientes mudou — passamos a ser vistos como referência no setor."</div>
+        <div class="testi-divider"></div>
+        <div class="testi-author"><div class="testi-avatar">AG</div><div><div class="testi-name">Agropeças</div><div class="testi-role">Setor Agrícola</div></div></div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-quote-icon">"</div>
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"Profissionalismo do início ao fim. Entregaram exatamente o que prometeram, dentro do prazo e com uma qualidade que superou nossas expectativas. Recomendo sem hesitar."</div>
+        <div class="testi-divider"></div>
+        <div class="testi-author"><div class="testi-avatar">SF</div><div><div class="testi-name">Safra Assistência Técnica</div><div class="testi-role">Assistência Técnica</div></div></div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-quote-icon">"</div>
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"Os vídeos que eles produziram para nós geraram um engajamento que nunca tínhamos visto. A criatividade e a estratégia por trás de cada peça fazem toda a diferença."</div>
+        <div class="testi-divider"></div>
+        <div class="testi-author"><div class="testi-avatar">HV</div><div><div class="testi-name">HemoVet</div><div class="testi-role">Saúde Animal</div></div></div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-quote-icon">"</div>
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"Minha marca ganhou outra dimensão. O site, as peças e a identidade toda ficaram acima do que eu imaginava. Hoje meus clientes me reconhecem de longe."</div>
+        <div class="testi-divider"></div>
+        <div class="testi-author"><div class="testi-avatar">ME</div><div><div class="testi-name">Maria Eduarda</div><div class="testi-role">Fisioterapia</div></div></div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-quote-icon">"</div>
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"Time extremamente dedicado e atencioso. Sentiram a identidade da nossa marca como se fosse a deles. O resultado final foi impecável e fez muito sucesso no mercado."</div>
+        <div class="testi-divider"></div>
+        <div class="testi-author"><div class="testi-avatar">PT</div><div><div class="testi-name">Portal Truck</div><div class="testi-role">Proteção Veicular</div></div></div>
+      </div>
+
+    </div>
+    <div class="testi-nav">
+      <button class="testi-btn" id="testiPrev">←</button>
+      <button class="testi-btn" id="testiNext">→</button>
+      <div class="testi-dots" id="testiDots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="section-tag reveal"><div class="section-tag-line"></div>Equipe</div>
+  <h2 class="section-title reveal">As pessoas por trás<br><em>dos resultados.</em></h2>
+  <div class="team-grid">
+    <div class="team-card reveal">
+      <div class="team-photo-wrap"><img class="team-photo" src="team-otavio.jpg" alt="Otávio Oliveira"></div>
+      <div class="team-info"><div class="team-rule"></div><div class="team-name">Otávio Oliveira</div><div class="team-role">Fundador · Designer Estratégico</div><div class="team-bio">Especialista em design estratégico, edição de vídeo e criação de sites. Lidera a visão criativa da Octa Studio, transformando identidades em ferramentas reais de crescimento.</div></div>
+    </div>
+    <div class="team-card reveal reveal-delay-1">
+      <div class="team-photo-wrap"><img class="team-photo" src="team-iago.png" alt="Iago Passos"></div>
+      <div class="team-info"><div class="team-rule"></div><div class="team-name">Iago Passos</div><div class="team-role">Especialista em Tráfego Pago</div><div class="team-bio">Especialista em Meta Ads e Google Ads. Responsável por colocar sua marca na frente de quem realmente importa — na hora certa, com a mensagem certa.</div></div>
+    </div>
+    <div class="team-card reveal reveal-delay-2">
+      <div class="team-photo-wrap"><img class="team-photo" src="team-gabriel.png" alt="Gabriel Carvalho"></div>
+      <div class="team-info"><div class="team-rule"></div><div class="team-name">Gabriel Carvalho</div><div class="team-role">Estratégia &amp; Gestão de Projetos</div><div class="team-bio">Especialista em planejamento estratégico e gestão de campanhas. Garante que cada projeto seja entregue no prazo, dentro do objetivo e acima da expectativa.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-left reveal-left">
+      <div class="c-tag"><div class="c-tag-line"></div>Vamos conversar</div>
+      <h2 class="contact-title">Vamos construir<br><em>algo que vale</em><br>a pena<span class="dot">.</span></h2>
+      <p class="contact-sub">Se você chegou até aqui, já sabe o que precisa. <strong>Fale com a nossa equipe</strong> e descubra como podemos estruturar a presença da sua marca do jeito certo.</p>
+      <div class="glass-cards">
+        <a href="https://wa.me/5535991409445" target="_blank" class="glass-card"><div class="glass-icon">📱</div><div><div class="glass-label">WhatsApp</div><div class="glass-value">+55 (35) 99140-9445</div></div></a>
+        <a href="mailto:otaviodsgcomercial@gmail.com" class="glass-card"><div class="glass-icon">✉️</div><div><div class="glass-label">E-mail</div><div class="glass-value">otaviodsgcomercial@gmail.com</div></div></a>
+      </div>
+    </div>
+    <div class="contact-right reveal-right">
+      <form class="contact-form" onsubmit="handleSubmit(event)">
+        <div class="form-group"><label>Nome</label><input type="text" placeholder="Seu nome completo" required><div class="form-line"></div></div>
+        <div class="form-group"><label>Empresa / Negócio</label><input type="text" placeholder="Nome do seu negócio"><div class="form-line"></div></div>
+        <div class="form-group"><label>WhatsApp</label><input type="tel" placeholder="(00) 00000-0000"><div class="form-line"></div></div>
+        <div class="form-group"><label>Serviço de interesse</label><input type="text" placeholder="Ex: Branding, Vídeo, Site..."><div class="form-line"></div></div>
+        <div class="form-group"><label>Mensagem</label><textarea placeholder="Conta um pouco sobre o seu projeto..."></textarea><div class="form-line"></div></div>
+        <button type="submit" class="submit-btn">Enviar mensagem →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <img src="logo-white.png" alt="Octa Studio" onerror="this.style.display='none';document.querySelector('.footer-brand-text').style.display='block'">
+      <div class="footer-brand-text">octa<em style="font-style:italic;font-weight:300">studio</em><span style="color:var(--red)">.</span></div>
+      <p class="footer-desc">Design estratégico, produção audiovisual e presença digital para negócios que querem crescer de verdade.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Serviços</div>
+      <ul class="footer-links">
+        <li><a href="#services">Criação de Marcas</a></li>
+        <li><a href="#services">Design Gráfico</a></li>
+        <li><a href="#services">Edição de Vídeo</a></li>
+        <li><a href="#services">Tráfego Pago</a></li>
+        <li><a href="#services">Criação de Sites</a></li>
+        <li><a href="#services">Estratégia Digital</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Contato</div>
+      <ul class="footer-links">
+        <li><a href="https://instagram.com/octastudio" target="_blank">Instagram</a></li>
+        <li><a href="https://wa.me/5535991409445" target="_blank">WhatsApp</a></li>
+        <li><a href="mailto:otaviodsgcomercial@gmail.com">E-mail</a></li>
+        <li><a href="#portfolio">Portfólio</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 Octa Studio. Todos os direitos reservados.</span>
+    <span class="footer-copy"><span class="footer-red">octa</span>studio.com.br</span>
+  </div>
+</footer>
+
+<script>
+/* ---- CURSOR ---- */
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.transform=`translate(${mx-4}px,${my-4}px)`});
+document.querySelectorAll('a,button,.service-item,.p-item,.team-card,.client-card,.reel-item,.testi-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.classList.add('hover');ring.classList.add('hover')});
+  el.addEventListener('mouseleave',()=>{cursor.classList.remove('hover');ring.classList.remove('hover')});
+});
+(function animRing(){rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;ring.style.transform=`translate(${rx-18}px,${ry-18}px)`;requestAnimationFrame(animRing)})();
+
+/* ---- NAV + PROGRESS ---- */
+const navbar=document.getElementById('navbar');
+window.addEventListener('scroll',()=>{
+  navbar.classList.toggle('scrolled',window.scrollY>60);
+  document.getElementById('progressBar').style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%';
+  parallaxHero();
+});
+
+/* ---- PARALLAX ---- */
+const heroParallax=document.getElementById('heroParallax');
+function parallaxHero(){
+  if(window.scrollY<window.innerHeight*1.5)heroParallax.style.transform=`translateY(${window.scrollY*0.35}px)`;
+}
+
+/* ---- PARTICLES ---- */
+const canvas=document.getElementById('particles-canvas');
+const ctx=canvas.getContext('2d');
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resizeCanvas();window.addEventListener('resize',resizeCanvas);
+class Particle{
+  constructor(){this.reset()}
+  reset(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.size=Math.random()*1.6+0.3;this.vx=(Math.random()-.5)*.35;this.vy=(Math.random()-.5)*.35;this.opacity=Math.random()*.45+0.08;this.color=Math.random()>.65?'229,36,33':'255,255,255'}
+  update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height)this.reset()}
+  draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=`rgba(${this.color},${this.opacity})`;ctx.fill()}
+}
+const particles=Array.from({length:100},()=>new Particle());
+(function animParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{p.update();p.draw()});
+  particles.forEach((a,i)=>particles.slice(i+1).forEach(b=>{
+    const d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(d<110){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(229,36,33,${.07*(1-d/110)})`;ctx.lineWidth=.5;ctx.stroke()}
+  }));
+  requestAnimationFrame(animParticles);
+})();
+
+/* ---- REVEAL ---- */
+const revObs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0.1});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale,.p-item,.client-card').forEach(r=>revObs.observe(r));
+
+/* ---- COUNT UP ---- */
+const cntObs=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(e.isIntersecting&&!e.target.dataset.counted){
+    e.target.dataset.counted='1';
+    e.target.closest('.stat-box').classList.add('counted');
+    const target=+e.target.dataset.target;let cur=0;const step=target/60;
+    const t=setInterval(()=>{cur+=step;if(cur>=target){cur=target;clearInterval(t)}e.target.textContent=Math.floor(cur)},16);
+  }
+}),{threshold:.5});
+document.querySelectorAll('.count-num').forEach(el=>cntObs.observe(el));
+
+/* ---- TESTIMONIALS SLIDER ---- */
+const track=document.getElementById('testiTrack');
+const cards=track.querySelectorAll('.testi-card');
+const dotsWrap=document.getElementById('testiDots');
+let current=0;
+const total=cards.length;
+const visible=()=>window.innerWidth<960?1:3;
+
+// build dots
+cards.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.className='testi-dot'+(i===0?' active':'');
+  d.addEventListener('click',()=>goTo(i));
+  dotsWrap.appendChild(d);
+});
+
+function goTo(idx){
+  current=Math.max(0,Math.min(idx,total-visible()));
+  const cardW=cards[0].offsetWidth+16;
+  track.style.transform=`translateX(-${current*cardW}px)`;
+  dotsWrap.querySelectorAll('.testi-dot').forEach((d,i)=>d.classList.toggle('active',i===current));
+}
+
+document.getElementById('testiPrev').addEventListener('click',()=>goTo(current-1));
+document.getElementById('testiNext').addEventListener('click',()=>goTo(current+1));
+
+// touch/drag
+let startX=0,isDragging=false;
+track.addEventListener('mousedown',e=>{startX=e.clientX;isDragging=true});
+track.addEventListener('mousemove',e=>{if(!isDragging)return;track.style.cursor='grabbing'});
+track.addEventListener('mouseup',e=>{
+  if(!isDragging)return;isDragging=false;track.style.cursor='';
+  const diff=startX-e.clientX;
+  if(Math.abs(diff)>50)goTo(diff>0?current+1:current-1);
+});
+track.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});
+track.addEventListener('touchend',e=>{
+  const diff=startX-e.changedTouches[0].clientX;
+  if(Math.abs(diff)>50)goTo(diff>0?current+1:current-1);
+});
+
+window.addEventListener('resize',()=>goTo(current));
+
+/* ---- SUBMIT ---- */
+function handleSubmit(e){
+  e.preventDefault();
+  const inputs=e.target.querySelectorAll('input,textarea');
+  const [nome,empresa,tel,servico,msg]=[...inputs].map(i=>i.value);
+  const text=`Olá, Octa Studio! Me chamo *${nome}*${empresa?', da empresa *'+empresa+'*':''}.%0A%0AInteresse em: *${servico||'serviços'}*%0A%0A${msg}${tel?'%0A%0ATel: '+tel:''}`;
+  window.open(`https://wa.me/5535991409445?text=${text}`,'_blank');
+}
+</script>
+</body>
+</html>
